@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+xgboost
+boto3
+sagemaker
+matplotlib
+seaborn
+jupyter
+openpyxl
+pyarrow

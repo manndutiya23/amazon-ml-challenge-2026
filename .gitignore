@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Data - keep the directory structure, not raw challenge data
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+# ML artifacts
+models/*
+!models/.gitkeep
+
+# Local outputs
+outputs/
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
