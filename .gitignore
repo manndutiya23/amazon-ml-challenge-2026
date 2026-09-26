@@ -33,3 +33,7 @@ logs/
 Thumbs.db
 
 .venv/
+
+# Large generated experiment artifacts
+experiments/candidate_features_sample.csv
+experiments/sample_candidate_pairs.tsv
