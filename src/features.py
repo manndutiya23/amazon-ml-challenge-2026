@@ -1,6 +1,7 @@
 import re
 
 from rapidfuzz.fuzz import ratio, token_set_ratio, token_sort_ratio
+from preprocessing import normalize_name, normalize_address
 
 
 def jaccard_tokens(a, b):
@@ -70,11 +71,11 @@ def feature_pair(row1, row2):
         country
     """
 
-    name1 = row1.get("name_norm", "")
-    name2 = row2.get("name_norm", "")
+    name1 = normalize_name(row1.get("business_name", ""))
+    name2 = normalize_name(row2.get("business_name", ""))
 
-    addr1 = row1.get("address_norm", "")
-    addr2 = row2.get("address_norm", "")
+    addr1 = normalize_address(row1.get("business_address", ""))
+    addr2 = normalize_address(row2.get("business_address", ""))
 
     country1 = str(row1.get("country", "") or "").strip().lower()
     country2 = str(row2.get("country", "") or "").strip().lower()
@@ -91,6 +92,8 @@ def feature_pair(row1, row2):
         digit_overlap = 0.0
 
     return {
+        "name_missing": int(not name1 or not name2),
+        "address_missing": int(not addr1 or not addr2),
         # -------------------------
         # Name features
         # -------------------------
