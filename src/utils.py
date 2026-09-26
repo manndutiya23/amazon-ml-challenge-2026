@@ -1,34 +1,30 @@
-from pathlib import Path
 import pandas as pd
 
 
 def load_ground_truth(
     ground_truth_path,
-    source2_ids=None,
-    source3_ids=None,
+    source2_ids,
+    source3_ids,
     chunksize=100_000,
 ):
     """
-    Load ground truth while keeping only match IDs that exist
-    in the supplied Source 2 / Source 3 datasets.
+    Load ground truth and classify Source 1 entities into:
 
-    Ground-truth references to records outside the supplied
-    datasets are ignored because those records cannot be used
-    for pairwise training.
+    safe_ground_truth:
+        Every GT match for the S1 entity exists in the supplied
+        training Source 2 / Source 3 records.
+
+    unsafe_s1_ids:
+        At least one GT match references an unavailable S2/S3 record.
+
+    Empty GT lists are considered safe singletons.
     """
 
-    valid_ids = None
+    valid_ids = set(source2_ids)
+    valid_ids.update(source3_ids)
 
-    if source2_ids is not None or source3_ids is not None:
-        valid_ids = set()
-
-        if source2_ids is not None:
-            valid_ids.update(source2_ids)
-
-        if source3_ids is not None:
-            valid_ids.update(source3_ids)
-
-    ground_truth = {}
+    safe_ground_truth = {}
+    unsafe_s1_ids = set()
 
     for chunk in pd.read_csv(
         ground_truth_path,
@@ -43,7 +39,7 @@ def load_ground_truth(
             raw_matches = row["matched_entity_ids"]
 
             if not raw_matches:
-                ground_truth[s1_id] = []
+                safe_ground_truth[s1_id] = []
                 continue
 
             matches = [
@@ -52,15 +48,18 @@ def load_ground_truth(
                 if x.strip()
             ]
 
-            if valid_ids is not None:
-                matches = [
-                    x for x in matches
-                    if x in valid_ids
-                ]
+            unavailable = [
+                x for x in matches
+                if x not in valid_ids
+            ]
 
-            # Remove duplicates while preserving order
+            if unavailable:
+                unsafe_s1_ids.add(s1_id)
+                safe_ground_truth.pop(s1_id, None)
+                continue
+
             matches = list(dict.fromkeys(matches))
 
-            ground_truth[s1_id] = matches
+            safe_ground_truth[s1_id] = matches
 
-    return ground_truth
+    return safe_ground_truth, unsafe_s1_ids
