@@ -25,7 +25,7 @@ EXPECTED_COUNTS = {
 
 # The challenge data is expected to contain these countries. Extra countries
 # are allowed because the challenge can add a country in a later split.
-EXPECTED_COUNTRIES = {"india", "usa", "france"}
+EXPECTED_COUNTRIES = {"india", "us", "france"}
 
 
 class DatasetValidationError(RuntimeError):
